@@ -19,6 +19,13 @@ tags_metadata = [
     }
 ]
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=database.engine)
+    yield
+
+
 app = FastAPI(
     title="To-Do API",
     description="""
@@ -44,22 +51,12 @@ API REST para gerenciamento de tarefas.
     contact={
         "name": "Gabriel Leal Menezes",
     },
-    openapi_tags=tags_metadata
-)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=database.engine)
-    yield
-
-
-app = FastAPI(
-    title="To-Do API",
+    openapi_tags=tags_metadata,
     lifespan=lifespan
 )
 
+     
 app.include_router(task_router)
-
 
 
 @app.get(
